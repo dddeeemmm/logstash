@@ -1,0 +1,26 @@
+---
+
+- name: add repo
+  template:
+    src: 'elasticsearch.repo.j2'
+    dest: '/etc/yum.repos.d/elasticsearch-{{ logstash_elasticsearch_major_version }}.repo'
+  when: ansible_os_family == 'RedHat'
+
+- name: install
+  package:
+    name: '{{ logstash_packages }}'
+  when: logstash_install | bool
+
+- name: config
+  template:
+    src: '{{ item }}'
+    dest: /etc/logstash/conf.d/{{ item | basename | regex_replace('\.j2$', '') }}
+  with_fileglob:
+    - ../templates/*.j2
+  register: logstash_config
+
+- name: enable and start
+  service:
+    name: logstash
+    state: '{% if logstash_config.changed %}restarted{% else %}started{% endif %}'
+    enabled: true

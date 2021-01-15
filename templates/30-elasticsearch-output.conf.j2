@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+
+output {
+  elasticsearch {
+    hosts => {{ logstash_elasticsearch_hosts }}
+#    manage_template => false
+#    manage_template => "true"
+#    template_overwrite => "true"
+    action => "index"
+    ilm_enabled => "false"
+#      index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+  #    index => "%{[@metadata][beat]}-%{[@metadata][name]}-%{+YYYY.MM.dd}"
+#      index => "%{[@metadata][hostname]}-%{[@metadata][version]}-%{+yyyy.MM.dd}"
+    index => "elb-%{[@metadata][beat]}-%{[env]}-%{+YYYY.MM.dd}"
+  }
+}
